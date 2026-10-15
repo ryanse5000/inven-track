@@ -2,7 +2,7 @@
 
 A simple inventory tracking web app built with ASP.NET Core Razor Pages and SQLite. Track items, record stock coming in and going out, and see what needs reordering at a glance.
 
-**Live demo:** <https://ryanse5000.github.io/InvenTrack/> (redirects to <https://inventrack-v3i5.onrender.com/>)
+**Live demo:** <https://ryanse5000.github.io/inven-track/> (redirects to <https://inventrack-v3i5.onrender.com/>)
 
 > The demo runs on Render's free plan. It sleeps when idle, so the first visit can take up to a minute, and its data resets to the sample items whenever it restarts or redeploys. Anyone with the link can change the data.
 
@@ -31,8 +31,8 @@ A simple inventory tracking web app built with ASP.NET Core Razor Pages and SQLi
 **Requirements:** [.NET 10 SDK](https://dotnet.microsoft.com/download)
 
 ```bash
-git clone https://github.com/ryanse5000/InvenTrack.git
-cd InvenTrack
+git clone https://github.com/ryanse5000/inven-track.git
+cd inven-track
 dotnet run
 ```
 

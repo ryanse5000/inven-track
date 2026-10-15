@@ -1,4 +1,6 @@
 using InvenTrack.Models;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 
 namespace InvenTrack.Data;
 
@@ -6,7 +8,17 @@ public static class SeedData
 {
     public static void Initialise(InventoryContext db)
     {
+        // SQLite creates the database file but not its folder (e.g. /home/data on Azure).
+        var dataSource = new SqliteConnectionStringBuilder(db.Database.GetConnectionString()).DataSource;
+        var folder = Path.GetDirectoryName(Path.GetFullPath(dataSource));
+        if (!string.IsNullOrEmpty(folder))
+            Directory.CreateDirectory(folder);
+
         db.Database.EnsureCreated();
+
+        // EF Core turns on SQLite's WAL mode, which doesn't work reliably on network
+        // storage such as Azure App Service's /home share. Use the classic journal instead.
+        db.Database.ExecuteSqlRaw("PRAGMA journal_mode=DELETE;");
 
         if (db.Items.Any())
             return;

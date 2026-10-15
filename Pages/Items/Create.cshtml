@@ -1,0 +1,28 @@
+@page
+@model InvenTrack.Pages.Items.CreateModel
+@{
+    ViewData["Title"] = "Add item";
+}
+
+<div style="max-width:880px">
+    <a asp-page="Index" class="back-link">@Icon.Get("arrow-left", 16) All items</a>
+
+    <div class="page-header">
+        <div>
+            <h1>Add item</h1>
+            <p>Opening quantity is recorded in the item's stock history.</p>
+        </div>
+    </div>
+
+    <form method="post">
+        <partial name="_ItemForm" for="Item" />
+        <div class="d-flex justify-content-end gap-2">
+            <a asp-page="Index" class="btn btn-light">Cancel</a>
+            <button type="submit" class="btn btn-primary">@Icon.Get("plus", 16) Add item</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,14 @@
+@model InvenTrack.Models.Item
+
+@if (Model.Quantity == 0)
+{
+    <span class="pill pill-red">Out of stock</span>
+}
+else if (Model.IsLowStock)
+{
+    <span class="pill pill-amber">Low stock</span>
+}
+else
+{
+    <span class="pill pill-green">In stock</span>
+}

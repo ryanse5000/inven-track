@@ -1,0 +1,19 @@
+@page "{id:int}"
+@model InvenTrack.Pages.Items.DeleteModel
+@{
+    ViewData["Title"] = "Delete item";
+}
+
+<div class="panel mx-auto mt-lg-4" style="max-width:480px">
+    <div class="panel-body p-4 text-center">
+        <span class="chip chip-red mx-auto mb-3">@Icon.Get("trash", 22)</span>
+        <h1 class="h4 fw-bold mb-2">Delete this item?</h1>
+        <p class="mb-1"><strong>@Model.Item.Name</strong></p>
+        <p class="sku mb-3">@Model.Item.Sku</p>
+        <p class="text-muted small mb-4">Its stock history will also be deleted. This can't be undone.</p>
+        <form method="post" class="d-flex justify-content-center gap-2">
+            <a asp-page="Details" asp-route-id="@Model.Item.Id" class="btn btn-light">Cancel</a>
+            <button type="submit" class="btn btn-danger">Delete item</button>
+        </form>
+    </div>
+</div>

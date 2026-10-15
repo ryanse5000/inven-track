@@ -1,0 +1,133 @@
+@page "{id:int}"
+@model InvenTrack.Pages.Items.DetailsModel
+@{
+    ViewData["Title"] = Model.Item.Name;
+    var item = Model.Item;
+}
+
+<a asp-page="Index" class="back-link">@Icon.Get("arrow-left", 16) All items</a>
+
+<div class="page-header">
+    <div>
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+            <h1>@item.Name</h1>
+            <partial name="_StockStatus" model="item" />
+        </div>
+        <div class="meta">
+            <span class="sku">@item.Sku</span>
+            @if (item.Category is not null)
+            {
+                <span>@Icon.Get("tag", 15) @item.Category</span>
+            }
+            @if (item.Location is not null)
+            {
+                <span>@Icon.Get("map-pin", 15) @item.Location</span>
+            }
+            <span>@Icon.Get("clock", 15) Updated @item.UpdatedAt.ToString("dd/MM/yyyy h:mm tt")</span>
+        </div>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-page="Edit" asp-route-id="@item.Id" class="btn btn-light">@Icon.Get("pencil", 16) Edit</a>
+        <a asp-page="Delete" asp-route-id="@item.Id" class="btn btn-light text-danger">@Icon.Get("trash", 16) Delete</a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-8">
+        <div class="facts">
+            <div class="fact">
+                <div class="fact-label">In stock</div>
+                <div class="fact-value">@item.Quantity</div>
+            </div>
+            <div class="fact">
+                <div class="fact-label">Reorder level</div>
+                <div class="fact-value">@item.ReorderLevel</div>
+            </div>
+            <div class="fact">
+                <div class="fact-label">Unit price</div>
+                <div class="fact-value">@item.UnitPrice.ToString("C")</div>
+            </div>
+            <div class="fact">
+                <div class="fact-label">Stock value</div>
+                <div class="fact-value">@item.StockValue.ToString("C")</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <form method="post" asp-page-handler="Adjust" class="panel h-100">
+            <div class="panel-header">
+                <h2>Adjust stock</h2>
+            </div>
+            <div class="panel-body">
+                <div asp-validation-summary="ModelOnly"></div>
+                <div class="segmented mb-3" role="group" aria-label="Direction">
+                    <input type="radio" class="btn-check" asp-for="Adjustment.Direction" value="in" id="dir-in" />
+                    <label class="btn btn-in" for="dir-in">@Icon.Get("stock-in", 16) Stock in</label>
+                    <input type="radio" class="btn-check" asp-for="Adjustment.Direction" value="out" id="dir-out" />
+                    <label class="btn btn-out" for="dir-out">@Icon.Get("stock-out", 16) Stock out</label>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Adjustment.Amount" class="form-label">Quantity</label>
+                    <input asp-for="Adjustment.Amount" class="form-control" min="1" />
+                    <span asp-validation-for="Adjustment.Amount"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Adjustment.Note" class="form-label">Note <span class="text-muted fw-normal">(optional)</span></label>
+                    <input asp-for="Adjustment.Note" class="form-control" placeholder="e.g. PO 1234, Job 5678" />
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Apply</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel-header">
+        <h2>@Icon.Get("history", 18) Stock history</h2>
+        <span class="small text-muted">@item.Movements.Count @(item.Movements.Count == 1 ? "entry" : "entries")</span>
+    </div>
+    @if (item.Movements.Count == 0)
+    {
+        <div class="empty">
+            <span class="chip chip-primary">@Icon.Get("inbox", 22)</span>
+            No movements yet.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Note</th>
+                        <th class="num">Change</th>
+                        <th class="num">Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var m in item.Movements)
+                    {
+                        var isIn = m.Change > 0;
+                        <tr>
+                            <td class="text-nowrap text-muted">@m.Timestamp.ToString("dd/MM/yyyy h:mm tt")</td>
+                            <td>
+                                <span class="d-inline-flex align-items-center gap-2">
+                                    <span class="chip chip-sm @(isIn ? "chip-green" : "chip-red")">@Icon.Get(isIn ? "stock-in" : "stock-out", 15)</span>
+                                    @m.Note
+                                </span>
+                            </td>
+                            <td class="num @(isIn ? "delta-in" : "delta-out")">@(isIn ? "+" : "")@m.Change</td>
+                            <td class="num fw-semibold">@m.QuantityAfter</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

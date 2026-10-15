@@ -1,0 +1,124 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="page-header">
+    <div>
+        <h1>Dashboard</h1>
+        <p>Stock overview as of @DateTime.Now.ToString("dddd d MMMM yyyy")</p>
+    </div>
+    <a asp-page="/Items/Create" class="btn btn-primary">@Icon.Get("plus", 16) Add item</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <a asp-page="/Items/Index" class="panel stat">
+            <span class="chip chip-primary">@Icon.Get("layers", 22)</span>
+            <div>
+                <div class="stat-label">Items</div>
+                <div class="stat-value">@Model.ItemCount</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="panel stat">
+            <span class="chip chip-sky">@Icon.Get("package", 22)</span>
+            <div>
+                <div class="stat-label">Units in stock</div>
+                <div class="stat-value">@Model.TotalUnits.ToString("N0")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="panel stat">
+            <span class="chip chip-green">@Icon.Get("dollar", 22)</span>
+            <div>
+                <div class="stat-label">Stock value</div>
+                <div class="stat-value">@Model.TotalValue.ToString("C")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <a asp-page="/Items/Index" asp-route-LowStockOnly="true" class="panel stat">
+            <span class="chip @(Model.LowStock.Count > 0 ? "chip-amber" : "chip-green")">@Icon.Get("alert", 22)</span>
+            <div>
+                <div class="stat-label">Low stock</div>
+                <div class="stat-value">@Model.LowStock.Count</div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="panel h-100">
+            <div class="panel-header">
+                <h2>@Icon.Get("alert", 18) Needs reordering</h2>
+                @if (Model.LowStock.Count > 0)
+                {
+                    <a asp-page="/Items/Index" asp-route-LowStockOnly="true" class="small fw-medium">View all</a>
+                }
+            </div>
+            @if (Model.LowStock.Count == 0)
+            {
+                <div class="empty">
+                    <span class="chip chip-green">@Icon.Get("check", 22)</span>
+                    Everything is above its reorder level.
+                </div>
+            }
+            else
+            {
+                <ul class="activity">
+                    @foreach (var item in Model.LowStock)
+                    {
+                        var pct = item.ReorderLevel == 0 ? 0 : Math.Min(100, item.Quantity * 100 / item.ReorderLevel);
+                        var colour = item.Quantity == 0 ? "var(--app-red)" : "var(--app-amber)";
+                        <li>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="d-flex justify-content-between gap-2 mb-1">
+                                    <a asp-page="/Items/Details" asp-route-id="@item.Id" class="fw-semibold text-truncate text-body">@item.Name</a>
+                                    <span class="small text-muted text-nowrap"><strong class="text-body">@item.Quantity</strong> / @item.ReorderLevel</span>
+                                </div>
+                                <div class="level"><span style="width:@(pct)%;background:@colour"></span></div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="panel h-100">
+            <div class="panel-header">
+                <h2>@Icon.Get("history", 18) Recent activity</h2>
+            </div>
+            @if (Model.RecentMovements.Count == 0)
+            {
+                <div class="empty">
+                    <span class="chip chip-primary">@Icon.Get("inbox", 22)</span>
+                    No stock movements yet.
+                </div>
+            }
+            else
+            {
+                <ul class="activity">
+                    @foreach (var m in Model.RecentMovements)
+                    {
+                        var isIn = m.Change > 0;
+                        <li>
+                            <span class="chip chip-sm @(isIn ? "chip-green" : "chip-red")">@Icon.Get(isIn ? "stock-in" : "stock-out", 16)</span>
+                            <div class="flex-grow-1 min-w-0">
+                                <a asp-page="/Items/Details" asp-route-id="@m.ItemId" class="fw-semibold d-block text-truncate text-body">@m.Item?.Name</a>
+                                <div class="small text-muted text-truncate">@(m.Note ?? (isIn ? "Stock in" : "Stock out")) · @m.Timestamp.ToString("dd/MM/yyyy h:mm tt")</div>
+                            </div>
+                            <span class="@(isIn ? "delta-in" : "delta-out") text-nowrap">@(isIn ? "+" : "")@m.Change</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>

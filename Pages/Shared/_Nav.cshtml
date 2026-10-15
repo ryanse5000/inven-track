@@ -1,0 +1,22 @@
+@{
+    var page = ViewContext.RouteData.Values["page"] as string ?? "";
+    string Active(bool on) => on ? "side-link active" : "side-link";
+}
+
+<a class="brand" asp-page="/Index">
+    <span class="brand-mark">@Icon.Get("package", 18)</span>
+    InvenTrack
+</a>
+
+<div class="nav-label">Menu</div>
+<a class="@Active(page == "/Index")" asp-page="/Index">@Icon.Get("dashboard") Dashboard</a>
+<a class="@Active(page.StartsWith("/Items/") && page != "/Items/Create")" asp-page="/Items/Index">@Icon.Get("layers") Items</a>
+<a class="@Active(page == "/Items/Create")" asp-page="/Items/Create">@Icon.Get("plus") Add item</a>
+
+<div class="sidebar-footer">
+    <button type="button" class="side-link w-100 border-0 bg-transparent" data-theme-toggle>
+        <span class="d-inline-flex theme-icon-dark">@Icon.Get("moon")</span>
+        <span class="d-inline-flex theme-icon-light">@Icon.Get("sun")</span>
+        <span>Toggle theme</span>
+    </button>
+</div>

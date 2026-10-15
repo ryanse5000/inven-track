@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - InvenTrack</title>
+    <script>
+        // Apply the saved (or system) theme before the page paints.
+        (function () {
+            var theme;
+            try { theme = localStorage.getItem("theme"); } catch (e) { }
+            if (!theme) theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            document.documentElement.setAttribute("data-bs-theme", theme);
+        })();
+    </script>
+    <script type="importmap"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        [data-bs-theme="dark"] .theme-icon-dark, [data-bs-theme="light"] .theme-icon-light { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        @* Desktop sidebar *@
+        <aside class="sidebar d-none d-lg-block">
+            <div class="sidebar-inner">
+                <partial name="_Nav" />
+            </div>
+        </aside>
+
+        @* Mobile slide-out menu *@
+        <div class="offcanvas offcanvas-start sidebar" tabindex="-1" id="mobileNav" aria-label="Menu">
+            <div class="offcanvas-body" data-bs-dismiss="offcanvas">
+                <partial name="_Nav" />
+            </div>
+        </div>
+
+        <div class="main">
+            <header class="topbar d-lg-none">
+                <button class="btn-icon btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNav" aria-controls="mobileNav" aria-label="Open menu">
+                    @Icon.Get("menu", 20)
+                </button>
+                <a class="brand" asp-page="/Index">
+                    <span class="brand-mark">@Icon.Get("package", 16)</span>
+                    InvenTrack
+                </a>
+            </header>
+
+            <main role="main" class="content">
+                @if (TempData["Message"] is string message)
+                {
+                    <div class="flash alert-dismissible fade show" role="status">
+                        @Icon.Get("check", 20)
+                        <span>@message</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
